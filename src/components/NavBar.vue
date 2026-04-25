@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useCart } from '../composables/useCart'
 import { useDarkMode } from '../composables/useDarkMode'
+import CartMenu from './CartMenu.vue'
 
 const { totalItems } = useCart()
 const { isDark, toggleDarkMode } = useDarkMode()
+
+const isCartOpen = ref(false)
 </script>
 
 <template>
@@ -20,7 +24,7 @@ const { isDark, toggleDarkMode } = useDarkMode()
             <span v-if="isDark">☀️</span>
             <span v-else>🌙</span>
           </button>
-          <div class="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
+          <div @click="isCartOpen = true" class="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
             <span class="text-xl">🛒</span>
             <span v-if="totalItems > 0" class="ml-1 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">
               {{ totalItems }}
@@ -30,4 +34,6 @@ const { isDark, toggleDarkMode } = useDarkMode()
       </div>
     </div>
   </nav>
+
+  <CartMenu :is-open="isCartOpen" @close="isCartOpen = false" />
 </template>
