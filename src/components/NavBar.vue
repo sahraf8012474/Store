@@ -24,6 +24,10 @@ const isCartOpen = ref(false)
             <span v-if="isDark">☀️</span>
             <span v-else>🌙</span>
           </button>
+          <router-link to="/login" class="flex items-center hover:opacity-80 transition-opacity">
+            <span class="text-xl">👤</span>
+            <span class="ml-1 text-sm font-medium text-gray-700 dark:text-gray-200">Login</span>
+          </router-link>
           <div @click="isCartOpen = true" class="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
             <span class="text-xl">🛒</span>
             <span v-if="totalItems > 0" class="ml-1 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">

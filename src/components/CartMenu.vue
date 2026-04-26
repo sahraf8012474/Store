@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useCart } from '../composables/useCart'
-import { defineProps, defineEmits } from 'vue'
 
 const { cart, removeFromCart, totalPrice } = useCart()
 
