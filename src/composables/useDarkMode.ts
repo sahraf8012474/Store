@@ -2,17 +2,19 @@ import { ref, watch, onMounted } from 'vue';
 
 const isDark = ref(false);
 
+// Initialize state immediately based on localStorage or system preference
+if (typeof window !== 'undefined') {
+  const savedTheme = localStorage.getItem('vue_spa_theme');
+  if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    isDark.value = true;
+    document.documentElement.classList.add('dark');
+  } else {
+    isDark.value = false;
+    document.documentElement.classList.remove('dark');
+  }
+}
+
 export function useDarkMode() {
-  onMounted(() => {
-    if (localStorage.getItem('vue_spa_theme') === 'dark' || 
-        (!('vue_spa_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      isDark.value = true;
-      document.documentElement.classList.add('dark');
-    } else {
-      isDark.value = false;
-      document.documentElement.classList.remove('dark');
-    }
-  });
 
   const toggleDarkMode = () => {
     isDark.value = !isDark.value;
