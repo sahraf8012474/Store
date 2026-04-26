@@ -17,8 +17,8 @@ const emit = defineEmits(['close'])
     <!-- Backdrop -->
     <div class="absolute inset-0 bg-black bg-opacity-50 transition-opacity" @click="emit('close')"></div>
 
-    <!-- Slide-over panel -->
-    <div class="fixed inset-y-0 right-0 max-w-md w-full flex transition-transform transform translate-x-0">
+    <!-- Full-page panel -->
+    <div class="fixed inset-0 w-full flex transition-transform transform translate-x-0 z-50">
       <div class="w-full h-full flex flex-col bg-white dark:bg-gray-800 shadow-xl overflow-y-scroll">
         <div class="flex-1 py-6 overflow-y-auto px-4 sm:px-6">
           <div class="flex items-start justify-between">
