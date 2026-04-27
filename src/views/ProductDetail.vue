@@ -5,9 +5,12 @@ import { fetchProductById } from '../services/api'
 import type { Product } from '../types'
 import { useCart } from '../composables/useCart'
 
+import { useRecentlyViewed } from '../composables/useRecentlyViewed'
+
 const route = useRoute()
 const router = useRouter()
 const { addToCart } = useCart()
+const { addToRecentlyViewed } = useRecentlyViewed()
 
 const product = ref<Product | null>(null)
 const loading = ref(true)
@@ -18,6 +21,9 @@ onMounted(async () => {
   try {
     const id = route.params.id as string
     product.value = await fetchProductById(id)
+    if (product.value) {
+      addToRecentlyViewed(product.value)
+    }
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load product'
   } finally {
