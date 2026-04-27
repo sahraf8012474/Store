@@ -2,12 +2,18 @@
 import { ref } from 'vue'
 import { useCart } from '../composables/useCart'
 import { useDarkMode } from '../composables/useDarkMode'
+import { useAuth } from '../composables/useAuth'
 import CartMenu from './CartMenu.vue'
 
 const { totalItems } = useCart()
 const { isDark, toggleDarkMode } = useDarkMode()
+const { user, isAuthenticated, logout } = useAuth()
 
 const isCartOpen = ref(false)
+
+const handleLogout = () => {
+  logout()
+}
 </script>
 
 <template>
@@ -24,7 +30,16 @@ const isCartOpen = ref(false)
             <span v-if="isDark">☀️</span>
             <span v-else>🌙</span>
           </button>
-          <router-link to="/login" class="flex items-center hover:opacity-80 transition-opacity">
+          <template v-if="isAuthenticated">
+            <div class="flex items-center space-x-3 group relative">
+              <img :src="user?.image" :alt="user?.username" class="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700" />
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ user?.firstName }}</span>
+              <button @click="handleLogout" class="ml-2 text-xs text-red-500 hover:text-red-600 font-bold uppercase tracking-tighter transition-colors">
+                Logout
+              </button>
+            </div>
+          </template>
+          <router-link v-else to="/login" class="flex items-center hover:opacity-80 transition-opacity">
             <span class="text-xl">👤</span>
             <span class="ml-1 text-sm font-medium text-gray-700 dark:text-gray-200">Login</span>
           </router-link>

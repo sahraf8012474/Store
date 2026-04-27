@@ -1,19 +1,34 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '../composables/useAuth'
 
 const router = useRouter()
-const email = ref('')
-const password = ref('')
+const { login } = useAuth()
+
+const username = ref('emilys') // Default for testing
+const password = ref('emilyspass') // Default for testing
 const isLoading = ref(false)
+const errorMessage = ref('')
 
 const handleLogin = async () => {
+  if (!username.value || !password.value) {
+    errorMessage.value = 'Please enter both username and password'
+    return
+  }
+
   isLoading.value = true
-  // Simulate API call
-  setTimeout(() => {
-    isLoading.value = false
+  errorMessage.value = ''
+  
+  try {
+    await login(username.value, password.value)
     router.push('/')
-  }, 1500)
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : 'Login failed. Please check your credentials.'
+    console.error('Login error:', error)
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
@@ -33,18 +48,21 @@ const handleLogin = async () => {
         </p>
       </div>
       <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
+        <div v-if="errorMessage" class="bg-red-500/20 border border-red-500/50 text-red-100 px-4 py-3 rounded-xl text-sm text-center">
+          {{ errorMessage }}
+        </div>
         <div class="rounded-md shadow-sm space-y-4">
           <div>
-            <label for="email-address" class="sr-only">Email address</label>
+            <label for="username" class="sr-only">Username</label>
             <input 
-              id="email-address" 
-              name="email" 
-              type="email" 
-              autocomplete="email" 
+              id="username" 
+              name="username" 
+              type="text" 
+              autocomplete="username" 
               required 
-              v-model="email"
+              v-model="username"
               class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-white/10 bg-white/5 placeholder-white/40 text-white focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all sm:text-sm" 
-              placeholder="Email address"
+              placeholder="Username"
             >
           </div>
           <div>
