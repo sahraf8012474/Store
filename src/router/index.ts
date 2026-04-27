@@ -26,8 +26,24 @@ const router = createRouter({
       path: '/contact',
       name: 'contact',
       component: ContactView
+    },
+    {
+      path: '/category/:category',
+      name: 'category',
+      component: HomeView
     }
   ]
+});
+
+// Navigation Guard
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem('auth_token');
+  
+  if (to.name === 'login' && isAuthenticated) {
+    next({ name: 'home' });
+  } else {
+    next();
+  }
 });
 
 export default router;

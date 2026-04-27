@@ -46,3 +46,18 @@ export async function login(username: string, password: string): Promise<LoginRe
 
   return response.json();
 }
+
+export async function signup(userData: any): Promise<any> {
+  const response = await fetch(`${BASE_URL}/users/add`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Signup failed');
+  }
+
+  return response.json();
+}

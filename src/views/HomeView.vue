@@ -1,17 +1,34 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { fetchProducts, fetchCategories } from '../services/api'
 import type { Product } from '../types'
 import FilterBar from '../components/FilterBar.vue'
 import ProductList from '../components/ProductList.vue'
 
+const route = useRoute()
+const router = useRouter()
 const products = ref<Product[]>([])
 const categories = ref<string[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 
 const searchQuery = ref('')
-const selectedCategory = ref('')
+const selectedCategory = ref((route.params.category as string) || '')
+
+// Watch for route changes (e.g. clicking a category link)
+watch(() => route.params.category, (newCategory) => {
+  selectedCategory.value = (newCategory as string) || ''
+})
+
+// Update route when category is selected from dropdown
+watch(selectedCategory, (newVal) => {
+  if (newVal) {
+    router.push(`/category/${newVal}`)
+  } else if (route.name === 'category') {
+    router.push('/')
+  }
+})
 
 onMounted(async () => {
   try {

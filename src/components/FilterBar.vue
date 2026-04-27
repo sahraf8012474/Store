@@ -46,6 +46,9 @@ const navigateToProduct = (id: number) => {
     <div class="flex-1 relative">
       <label for="search" class="sr-only">Search products</label>
       <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
         <input 
           id="search"
           type="text" 
@@ -53,16 +56,16 @@ const navigateToProduct = (id: number) => {
           placeholder="Search products..." 
           @focus="handleFocus"
           @blur="handleBlur"
-          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white transition-colors"
+          class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 dark:text-white transition-all duration-300"
         />
         
         <!-- Recently Viewed Suggestions -->
         <div 
           v-if="isSearchFocused && !localSearch && recentlyViewed.length > 0"
-          class="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl overflow-hidden"
+          class="absolute z-50 mt-2 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2"
         >
           <div class="p-3 border-b border-gray-100 dark:border-gray-700">
-            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Recently Viewed</h3>
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest px-2">Recently Viewed</h3>
           </div>
           <div class="max-h-64 overflow-y-auto">
             <div 
@@ -71,9 +74,9 @@ const navigateToProduct = (id: number) => {
               @click="navigateToProduct(product.id)"
               class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
             >
-              <img :src="product.thumbnail" :alt="product.title" class="w-10 h-10 object-cover rounded bg-gray-100 dark:bg-gray-900" />
+              <img :src="product.thumbnail" :alt="product.title" class="w-10 h-10 object-cover rounded-lg bg-gray-100 dark:bg-gray-900" />
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ product.title }}</p>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ product.title }}</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">${{ product.price }}</p>
               </div>
             </div>
@@ -81,18 +84,31 @@ const navigateToProduct = (id: number) => {
         </div>
       </div>
     </div>
-    <div class="w-full md:w-64">
-      <label for="category" class="sr-only">Filter by category</label>
-      <select 
-        id="category"
-        v-model="localCategory"
-        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white transition-colors"
+  </div>
+
+  <!-- Category Direct Access -->
+  <div class="mb-8">
+    <div class="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+      <button 
+        @click="localCategory = ''"
+        class="whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 border-2"
+        :class="localCategory === '' 
+          ? 'bg-primary border-primary text-white shadow-lg shadow-primary/30' 
+          : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-primary dark:hover:border-primary'"
       >
-        <option value="">All Categories</option>
-        <option v-for="cat in categories" :key="cat" :value="cat">
-          {{ cat.charAt(0).toUpperCase() + cat.slice(1).replace('-', ' ') }}
-        </option>
-      </select>
+        All Categories
+      </button>
+      <button 
+        v-for="cat in categories" 
+        :key="cat"
+        @click="localCategory = cat"
+        class="whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 border-2"
+        :class="localCategory === cat 
+          ? 'bg-primary border-primary text-white shadow-lg shadow-primary/30' 
+          : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-primary dark:hover:border-primary'"
+      >
+        {{ cat.charAt(0).toUpperCase() + cat.slice(1).replace('-', ' ') }}
+      </button>
     </div>
   </div>
 </template>
