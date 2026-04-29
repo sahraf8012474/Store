@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { fetchProductById } from '../services/api'
+import { fetchProductById, fetchProducts } from '../services/api'
 import type { Product } from '../types'
 import { useCart } from '../composables/useCart'
+import ProductCard from '../components/ProductCard.vue'
 
 import { useRecentlyViewed } from '../composables/useRecentlyViewed'
 
@@ -13,21 +14,59 @@ const { addToCart } = useCart()
 const { addToRecentlyViewed } = useRecentlyViewed()
 
 const product = ref<Product | null>(null)
+const relatedProducts = ref<Product[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const activeImage = ref(0)
 
 onMounted(async () => {
   try {
+    loading.value = true
     const id = route.params.id as string
-    product.value = await fetchProductById(id)
+    
+    // Fetch current product and all products for related section
+    const [productData, allProducts] = await Promise.all([
+      fetchProductById(id),
+      fetchProducts()
+    ])
+    
+    product.value = productData
+    
     if (product.value) {
       addToRecentlyViewed(product.value)
+      
+      // Filter related products by category
+      relatedProducts.value = allProducts
+        .filter(p => p.category === product.value?.category && p.id !== product.value?.id)
+        .slice(0, 4)
     }
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load product'
   } finally {
     loading.value = false
+  }
+})
+
+// Watch for route changes to reload product
+import { watch } from 'vue'
+watch(() => route.params.id, async (newId) => {
+  if (newId) {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    loading.value = true
+    try {
+      product.value = await fetchProductById(newId as string)
+      if (product.value) {
+        addToRecentlyViewed(product.value)
+        const allProducts = await fetchProducts()
+        relatedProducts.value = allProducts
+          .filter(p => p.category === product.value?.category && p.id !== product.value?.id)
+          .slice(0, 4)
+      }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to load product'
+    } finally {
+      loading.value = false
+    }
   }
 })
 
@@ -133,6 +172,26 @@ const handleAddToCart = () => {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Related Products Section -->
+    <div v-if="!loading && product && relatedProducts.length > 0" class="mt-16 mb-12">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="p-2 bg-primary/10 rounded-lg">
+          <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Related Products</h2>
+      </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <ProductCard 
+          v-for="relProduct in relatedProducts" 
+          :key="relProduct.id" 
+          :product="relProduct" 
+        />
       </div>
     </div>
   </div>
